@@ -268,7 +268,7 @@ for i in range(len(obs)):
     cv2.circle(homo,obs[i],28,(255,0,255),3)
 
                  
-#設定turnL90為homo左轉90度
+#設定turnL90為homo左轉90度.
 turnL90=cv2.rotate(homo,cv2.ROTATE_90_COUNTERCLOCKWISE)
 cv2.imshow('poolball',turnL90)
 cv2.waitKey(0)
