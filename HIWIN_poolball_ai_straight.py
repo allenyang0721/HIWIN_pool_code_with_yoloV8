@@ -126,6 +126,7 @@ def rebpoint_list(mom,kid,hole):
         fb_list.append(fakeball(kid,hole[i]))
     reb_list=[]
     for i in range(6):
+        
         for j in range(4):
             reb_list.append(rebound(fb_list[i],mom)[j])
     return reb_list
@@ -133,9 +134,10 @@ def rebpoint_list(mom,kid,hole):
 #假球list
 def fakeball_list(kid,hole):
     fb_list=[]
-    for j in range(4):
-        for i in range(6):
-            fb_list.append(fakeball(kid,hole[i]))
+    for i in range(4):
+        i
+        for j in range(6):
+            fb_list.append(fakeball(kid,hole[j]))
     return fb_list
 
 
@@ -225,7 +227,7 @@ if reb==True:
                     if crush_one(joker[i][0],joker[i][1],rball)==False:
                          if crush(rball,joker[i][2],obs)==False:
                             if getAngle((joker[i][0]),rball,joker[i][2])<=10:
-                                #if getAngle((joker[i][1]),(joker[i][0]),joker[i][2])<=30:
+                                #if getAngle((joker[i][1]),(joker[i][0]),joker[i][2])<=90:
                                  #print(str(getA((joker[i][0]),rball,joker[i][2])))
                                  analpp.append(joker[i])
                                  print(joker[i])
@@ -259,7 +261,7 @@ if mix==True:
     line(rball,mixf1)
     line(mixf1,obs[0])
     line(obs[0],h)
-
+print(fakeball_list(rball,holes))
 cv2.circle(homo,wball,28,(200,255,200),3)
 cv2.circle(homo,rball,28,(0,0,255),3)
 for i in range(len(obs)):
