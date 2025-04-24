@@ -3,7 +3,7 @@ import numpy as np
 import cv2
 
 #-------⚡手動輸入區(圖片 母球 子球)⚡---------
-homo = cv2.imread('case2.png') # 00空桌,01直擊,02反彈,03組合
+homo = cv2.imread('pool_data/case2.png') # 00空桌,01直擊,02反彈,03組合
 wball = (250,750) #母 120 740
 rball = (250,125) #子 310 810
 obs=[(28,250),(250,250)]#障礙 400,925
