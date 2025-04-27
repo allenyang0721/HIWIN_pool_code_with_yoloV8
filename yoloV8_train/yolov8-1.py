@@ -1,2 +1,2 @@
 from ultralytics import YOLO
-print("gay")
+print("gay who ")
