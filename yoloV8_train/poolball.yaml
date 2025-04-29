@@ -1,0 +1,4 @@
+train: /content/gogo_data
+val: /content/gogo_data
+nc: 5
+names: ['Ball3','Mom','Ball2','Ball1','Hole']
