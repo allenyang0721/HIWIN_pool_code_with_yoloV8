@@ -16,7 +16,7 @@ pipeline.start(config)
 print("按下空白鍵以拍照並儲存圖片，按下 ESC 鍵退出程式")
 
 # 創建儲存圖片的資料夾
-save_dir = 'captured_images'
+save_dir = 'take_images'
 os.makedirs(save_dir, exist_ok=True)
 
 img_counter = 0

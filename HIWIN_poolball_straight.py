@@ -3,10 +3,10 @@ import numpy as np
 import cv2
 
 #-------⚡手動輸入區(圖片 母球 子球)⚡---------
-homo = cv2.imread('00.png') # 00空桌,01直擊,02反彈,03組合
-wball = (120,740) #母 120 740
-rball = (310,810) #子 310 810
-obs=[(400,925),(4000,700)]#障礙 400,925
+homo = cv2.imread('pool_data/case2.png') # 00空桌,01直擊,02反彈,03組合
+wball = (250,750) #母 120 740
+rball = (250,125) #子 310 810
+obs=[(28,250),(250,250)]#障礙 400,925
 
 #-----⚡函式區⚡-------
 
@@ -56,23 +56,34 @@ def line(a,b):
 def crush(a,b,c):
     #adot bdot c=ball y=ax+b
     ass=0
-    m=(b[1]-a[1])/(b[0]-a[0])
     y=a[1]
     x=a[0]
-    z=(b[1]-m*b[0])
-    (m*x)-y+z==0
-    for i in range(len(obs)):
-        
-        gay=abs(m*(c[i][0])-(c[i][1])+z)
-        ans=gay/getLong(m,-1)
-    
-        if 0<=ans<=57:
-           
-            #ass=ass+1
+    if b[0]==a[0]:
+        for i in range(len(c)):
+            ans=abs(a[1]-c[i][1])
             
-            if (x-28)<=c[i][0]<=(b[0]+28) and (y-28)<=c[i][1]<=(b[1]+28):
-                ass=ass+1
-        
+    else:
+        m=(b[1]-a[1])/(b[0]-a[0])
+    
+        z=(b[1]-m*b[0])
+        (m*x)-y+z==0
+        for i in range(len(c)):
+            
+            gay=abs(m*(c[i][0])-(c[i][1])+z)
+            ans=gay/getLong(m,-1)
+            #print("距離",str(ans))
+
+            if 0<=ans<=57:
+                
+                #ass=ass+1
+                bigx=max(x-28,b[0]+28)
+                smallx=min(x-28,b[0]+28)
+                bigy=max(y-28,b[1]+28)
+                smally=min(y-28,b[1]+28)
+                if smallx<=c[i][0]<=bigx or smally<=c[i][1]<=bigy:
+                    ass=ass+1
+                    
+            
     if ass>0:
         return True
     else:
@@ -115,6 +126,7 @@ def rebpoint_list(mom,kid,hole):
         fb_list.append(fakeball(kid,hole[i]))
     reb_list=[]
     for i in range(6):
+        
         for j in range(4):
             reb_list.append(rebound(fb_list[i],mom)[j])
     return reb_list
@@ -122,9 +134,10 @@ def rebpoint_list(mom,kid,hole):
 #假球list
 def fakeball_list(kid,hole):
     fb_list=[]
-    for j in range(4):
-        for i in range(6):
-            fb_list.append(fakeball(kid,hole[i]))
+    for i in range(4):
+        i
+        for j in range(6):
+            fb_list.append(fakeball(kid,hole[j]))
     return fb_list
 
 
@@ -145,7 +158,7 @@ hol=[]
 for i in range(6):
     angle=abs(getAngle(wball,rball,holes[i]))
     #print(str(angle))
-    if angle is not None and 0<=angle<=70:
+    if angle is not None and 0<=angle<=90:
         #print(str(angle))
         hol.append((holes[i]))
         
@@ -153,10 +166,10 @@ for i in range(6):
 reb = False
 mix = False
 #直球判斷
-print(str(hol))
+print("可選的直擊袋口",str(hol))
 if hol:
     h=min(hol)
-    print(crush(wball,rball,obs))
+    print(crush(wball,fakeball(rball,h),obs))
     print(crush(fakeball(rball,h),h,obs))
     if crush(wball,fakeball(rball,h),obs)==False:
         if crush(fakeball(rball,h),h,obs)==False:
@@ -180,12 +193,12 @@ if hol:
         DOT(holes[i])
 
     if straight==True:
-        
-        cv2.line(homo, h, fakeball(rball,h), (150, 170,30), 3)  # 洞口>>假想球 draw line
-        cv2.line(homo, wball, fakeball(rball,h), (150, 170,30), 3)  # 白球>>假想球 draw line
-        cv2.circle(homo,fakeball(rball,h),28,(200,100,0),3) #畫假想圓
-        DOT(fakeball(rball,h))#畫假想圓心
-        
+        for i in range(len(hol)):
+            cv2.line(homo, hol[i], fakeball(rball,hol[i]), (150, 170,30), 3)  # 洞口>>假想球 draw line
+            cv2.line(homo, wball, fakeball(rball,hol[i]), (150, 170,30), 3)  # 白球>>假想球 draw line
+            cv2.circle(homo,fakeball(rball,hol[i]),28,(200,100,0),3) #畫假想圓
+            DOT(fakeball(rball,hol[i]))#畫假想圓心
+            
     elif straight==False:
         print("不可直接擊打")
 
@@ -207,27 +220,32 @@ if reb==True:
             joker.append((ana,bnb,hnh))  
     analpp=[]
     for i in range(len(joker)):
+        
         if crush(wball,joker[i][1],obs)==False:
             if crush(joker[i][1],joker[i][0],obs)==False:
                 if crush(joker[i][0],joker[i][2],obs)==False:
                     if crush_one(joker[i][0],joker[i][1],rball)==False:
                          if crush(rball,joker[i][2],obs)==False:
                             if getAngle((joker[i][0]),rball,joker[i][2])<=10:
-                                if getAngle((joker[i][1]),(joker[i][0]),joker[i][2])<=30:
+                                #if getAngle((joker[i][1]),(joker[i][0]),joker[i][2])<=90:
                                  #print(str(getA((joker[i][0]),rball,joker[i][2])))
                                  analpp.append(joker[i])
+                                 print(joker[i])
                             
-    print(str(analpp))
-    try:
-        i=0
-        cv2.circle(homo,((round(analpp[i][0][0])),round(analpp[i][0][1])),28,(200,100,0),3)#反彈假想
-        DOT(((round(analpp[i][0][0])),round(analpp[i][0][1])))
-        DOT(((round(analpp[i][1][0])),round(analpp[i][1][1])))
-        line(((round(analpp[i][0][0])),round(analpp[i][0][1])),((round(analpp[i][1][0])),round(analpp[i][1][1])))
-        line(((rball[0],rball[1])),((round(analpp[i][0][0])),round(analpp[i][0][1])))
-        line(((round(analpp[i][2][0])),round(analpp[i][2][1])),(((rball[0],rball[1]))))
-        line(((wball[0],wball[1])),((round(analpp[i][1][0])),round(analpp[i][1][1])))
-    except:
+    #print(str(analpp))
+    if len(analpp)!=0:
+        len_of_ap=len(analpp)
+        
+        for i in range(len_of_ap):
+            #i=0
+            cv2.circle(homo,((round(analpp[i][0][0])),round(analpp[i][0][1])),28,(200,100,0),3)#反彈假想
+            DOT(((round(analpp[i][0][0])),round(analpp[i][0][1])))
+            DOT(((round(analpp[i][1][0])),round(analpp[i][1][1])))
+            line(((round(analpp[i][0][0])),round(analpp[i][0][1])),((round(analpp[i][1][0])),round(analpp[i][1][1])))
+            line(((rball[0],rball[1])),((round(analpp[i][0][0])),round(analpp[i][0][1])))
+            line(((round(analpp[i][2][0])),round(analpp[i][2][1])),(((rball[0],rball[1]))))
+            line(((wball[0],wball[1])),((round(analpp[i][1][0])),round(analpp[i][1][1])))
+    else:
         print("沒有適合打擊的角度，重設座標")
 
 if mix==True:
@@ -243,14 +261,14 @@ if mix==True:
     line(rball,mixf1)
     line(mixf1,obs[0])
     line(obs[0],h)
-
+print(fakeball_list(rball,holes))
 cv2.circle(homo,wball,28,(200,255,200),3)
 cv2.circle(homo,rball,28,(0,0,255),3)
 for i in range(len(obs)):
     cv2.circle(homo,obs[i],28,(255,0,255),3)
 
                  
-#設定turnL90為homo左轉90度
+#設定turnL90為homo左轉90度.
 turnL90=cv2.rotate(homo,cv2.ROTATE_90_COUNTERCLOCKWISE)
 cv2.imshow('poolball',turnL90)
 cv2.waitKey(0)
