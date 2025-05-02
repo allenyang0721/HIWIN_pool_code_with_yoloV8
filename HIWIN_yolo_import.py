@@ -5,33 +5,32 @@ import os
 
 # ------- ⚡ 參數設定 ⚡ -------
 BALL_RADIUS = 14
-COLLISION_RADIUS = 30  # 明確設定為 30，以符合新版碰撞標準
+COLLISION_RADIUS = 29  
 FAKEBALL_OFFSET = BALL_RADIUS * 2
 SAVE_PATH = 'output/pool_analysis.png'
 
-# ------- ⚡ 圖片與 YOLO 標籤路徑 ⚡ -------
-path_tt='pool_data_yolo/fo_Photo_012'
-img_path = f'{path_tt}.png'
-label_path = f'{path_tt}.txt'
-classes_path = 'pool_data_yolo/classes.txt'
-
-# ------- ⚡ 載入圖片與標籤 ⚡ -------
-homo = cv2.imread(img_path)
+# ------- ⚡ YOLO 模型推論 ⚡ -------
+from ultralytics import YOLO
+MODEL_PATH = r"C:\Users\Gillion-BennyWinNB\Desktop\2025HIWIN_poolball\yoloV8_train\956PT_0428_best.pt"
+IMG_PATH = 'pool_data_yolo/fo_Photo_013.png'
+model = YOLO(MODEL_PATH)
+results = model(IMG_PATH)
+homo = cv2.imread(IMG_PATH)
 img_h, img_w = homo.shape[:2]
 
-# 讀取 YOLO 標籤
+# 直接使用 YOLO 模型輸出
+
 detections = []
-with open(label_path, 'r') as f:
-    for line in f.readlines():
-        parts = line.strip().split()
-        class_id = int(parts[0])
-        x_center = float(parts[1]) * img_w
-        y_center = float(parts[2]) * img_h
-        width = float(parts[3]) * img_w
-        height = float(parts[4]) * img_h
+for result in results:
+    for box in result.boxes:
+        x1, y1, x2, y2 = box.xyxy[0].tolist()
+        class_id = int(box.cls[0].item())
+        cx = int((x1 + x2) / 2)
+        cy = int((y1 + y2) / 2)
         detections.append({
             'class_id': class_id,
-            'xyxy': [x_center - width/2, y_center - height/2, x_center + width/2, y_center + height/2]
+            'xyxy': [x1, y1, x2, y2],
+            'center': (cx, cy)
         })
 
 # ------- ⚡ 球類別分類 ⚡ -------
@@ -41,9 +40,7 @@ holes = []
 
 for det in detections:
     class_id = det['class_id']
-    x_min, y_min, x_max, y_max = det['xyxy']
-    cx = int((x_min + x_max) / 2)
-    cy = int((y_min + y_max) / 2)
+    cx, cy = det['center']
     pos = (cx, cy)
     if class_id == 0:
         mom = pos
@@ -294,7 +291,7 @@ else:
         # 畫出法線方向（藍色）
         dx = ana[0] - bnb[0]
         dy = ana[1] - bnb[1]
-        if abs(dx) > abs(dy):  # 撞垂直牆（左右）→ 法線為水平
+        if abs(dx) < abs(dy):  # 撞垂直牆（左右）→ 法線為水平
             normal_dir = np.array([0, 1])  # 垂直方向
         else:  # 撞水平牆（上下）→ 法線為垂直
             normal_dir = np.array([1, 0])  # 水平方向
@@ -364,6 +361,12 @@ for k, v in ball_dict.items():
 
 os.makedirs(os.path.dirname(SAVE_PATH), exist_ok=True)
 cv2.imwrite(SAVE_PATH, homo)
+cv2.putText(homo, os.path.basename(IMG_PATH), (20, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+cv2.putText(homo, f"Ball{bid}", (20, 65), cv2.FONT_HERSHEY_SIMPLEX, 1, (100, 255, 255), 2)
+    # if incident_angle is not None:
+    #     cv2.putText(homo, f"Incident: {incident_angle:.1f}°", (20, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2)
+    # if exit_angle is not None:
+    #     cv2.putText(homo, f"Exit: {exit_angle:.1f}°", (20, 135), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 200, 255), 2)
 cv2.imshow('poolball', homo)
 cv2.waitKey(0)
 cv2.destroyAllWindows()

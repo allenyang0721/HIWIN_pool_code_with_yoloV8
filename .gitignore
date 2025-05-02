@@ -1,9 +1,6 @@
 .vscode/
 *.jpg
 *.png
-*.gif
-*.mp4
-*.mp3
-*.wav
-*.ogg
+*.txt
+*.exe
 Squareplt/

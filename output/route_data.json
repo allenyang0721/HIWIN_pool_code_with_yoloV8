@@ -1,27 +1,24 @@
 {
   "bid": 1,
-  "type": "rebound",
+  "type": "direct",
   "wball": [
     196,
-    220
+    183
   ],
   "rball": [
-    497,
-    346
+    354,
+    277
   ],
   "hole": [
-    46,
-    127
+    599,
+    386
   ],
   "fakeball": [
-    522,
-    358
+    328,
+    265
   ],
-  "rebound_point": [
-    585,
-    289.0
-  ],
-  "angle": 89.74037190509769,
-  "incident_angle": 122.3390511649172,
-  "exit_angle": 73.2435680268051
+  "rebound_point": null,
+  "angle": null,
+  "incident_angle": null,
+  "exit_angle": null
 }
