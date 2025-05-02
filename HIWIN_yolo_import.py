@@ -9,16 +9,41 @@ COLLISION_RADIUS = 29
 FAKEBALL_OFFSET = BALL_RADIUS * 2
 SAVE_PATH = 'output/pool_analysis.png'
 
+# ------- ⚡ 拍照階段：使用 D435 RGB 相機（OpenCV） -------
+import time
+cap = cv2.VideoCapture(0)
+print("📸 按 [空白鍵] 拍照, [ESC] 離開")
+IMG_PATH = None
+
+while True:
+    ret, frame = cap.read()
+    if not ret:
+        continue
+    cv2.imshow('D435 RGB View', frame)
+    key = cv2.waitKey(1)
+    if key == 32:  # Space
+        timestamp = time.strftime("%Y%m%d_%H%M%S")
+        IMG_PATH = f"captured_{timestamp}.png"
+        cv2.imwrite(IMG_PATH, frame)
+        print(f"✅ 拍照成功：{IMG_PATH}")
+        break
+    elif key == 27:
+        cap.release()
+        cv2.destroyAllWindows()
+        exit()
+cap.release()
+cv2.destroyAllWindows()
+
 # ------- ⚡ YOLO 模型推論 ⚡ -------
 from ultralytics import YOLO
 MODEL_PATH = r"C:\Users\Gillion-BennyWinNB\Desktop\2025HIWIN_poolball\yoloV8_train\956PT_0428_best.pt"
-IMG_PATH = 'pool_data_yolo/fo_Photo_013.png'
+# IMG_PATH 由拍照階段自動指定
 model = YOLO(MODEL_PATH)
 results = model(IMG_PATH)
 homo = cv2.imread(IMG_PATH)
 img_h, img_w = homo.shape[:2]
 
-# 直接使用 YOLO 模型輸出
+# 直接使用 YOLO 模型輸出的結果
 
 detections = []
 for result in results:
@@ -166,30 +191,32 @@ hol = [h for h in holes if 0 <= getAngle(wball, rball, h) <= 90]
 for h in hol:
     fake = fakeball(rball, h)
     if crush_precise(wball, fake, obs):
-        print("🚫 母球到假想球 被障礙擋住")
+        #print("🚫 母球到假想球 被障礙擋住")
         continue
     # 忽略母球提前打到目標球，不當作碰撞失敗
     # if crush_one_precise(wball, fake, rball):
     #     print("🚫 母球提前碰到目標球")
     #     continue
     if crush_precise(fake, h, obs):
-        print("🚫 假想球到洞口路徑被障礙擋住")
+        #print("🚫 假想球到洞口路徑被障礙擋住")
         continue
     if crush_precise(rball, h, obs):
-        print("🚫 目標球到洞口之間有障礙球")
+        #print("🚫 目標球到洞口之間有障礙球")
         # 嘗試組合球代替直擊
         continue  # 確保目標球到洞口這段不被擋住
     if crush_precise(fake, rball, obs):
-        print("🚫 假想球到目標球 被障礙擋住")
+        #print("🚫 假想球到目標球 被障礙擋住")
         continue  # 假想球擊中目標球路徑不得被擋住
     if crush_precise(wball, rball, obs):
-        print("🚫 母球到目標球之間有障礙球")
+        #print("🚫 母球到目標球之間有障礙球")
         continue  # ⛔ 額外補強：母球 → 目標球也不得被阻擋
 
-    angle_score = getAngle(wball, fake, rball)
+    
     if getAngle(wball, rball, h) > 90:
-        print("🚫 直擊夾角大於90度")
+        #print("🚫 直擊夾角大於90度")
         continue
+
+    angle_score = getAngle(wball, fake, rball)
     dist_score = np.linalg.norm(np.array(wball) - np.array(fake))
     score = angle_score + dist_score * 0.05
 
@@ -211,7 +238,7 @@ if best_path:
     cv2.circle(homo, fake, BALL_RADIUS, (200, 100, 0), 2)
     DOT(fake)
 else:
-    print(f"🌀 嘗試組合球")
+    print(f"嘗試組合球")
     if len(obs) >= 1:
         best_combo = None
         best_combo_score = float('inf')
@@ -367,6 +394,7 @@ cv2.putText(homo, f"Ball{bid}", (20, 65), cv2.FONT_HERSHEY_SIMPLEX, 1, (100, 255
     #     cv2.putText(homo, f"Incident: {incident_angle:.1f}°", (20, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2)
     # if exit_angle is not None:
     #     cv2.putText(homo, f"Exit: {exit_angle:.1f}°", (20, 135), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 200, 255), 2)
+print(mom)#母球座標
 cv2.imshow('poolball', homo)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
