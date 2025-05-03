@@ -27,7 +27,7 @@ while True:
         cv2.imwrite(IMG_PATH, frame)
         print(f"✅ 拍照成功：{IMG_PATH}")
         break
-    elif key == 27:
+    elif key == 27:# ESC
         cap.release()
         cv2.destroyAllWindows()
         exit()
