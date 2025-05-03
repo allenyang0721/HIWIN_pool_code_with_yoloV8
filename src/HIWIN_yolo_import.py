@@ -7,7 +7,8 @@ import os
 BALL_RADIUS = 14
 COLLISION_RADIUS = 29  
 FAKEBALL_OFFSET = BALL_RADIUS * 2
-SAVE_PATH = 'output/pool_analysis.png'
+PROJECT_ROOT=r"C:\Users\Gillion-BennyWinNB\Desktop\2025HIWIN_poolball"#只需要把這行改成這個資料夾的絕對路徑即可
+SAVE_PATH = f'{PROJECT_ROOT}\output\pool_analysis.png'
 
 # ------- ⚡ 拍照階段：使用 D435 RGB 相機（OpenCV） -------
 import time
@@ -23,7 +24,7 @@ while True:
     key = cv2.waitKey(1)
     if key == 32:  # Space
         timestamp = time.strftime("%Y%m%d_%H%M%S")
-        IMG_PATH = f"captured_{timestamp}.png"
+        IMG_PATH = f"{PROJECT_ROOT}\captured_{timestamp}.png"
         cv2.imwrite(IMG_PATH, frame)
         print(f"✅ 拍照成功：{IMG_PATH}")
         break
@@ -36,7 +37,7 @@ cv2.destroyAllWindows()
 
 # ------- ⚡ YOLO 模型推論 ⚡ -------
 from ultralytics import YOLO
-MODEL_PATH = r"C:\Users\Gillion-BennyWinNB\Desktop\2025HIWIN_poolball\yoloV8_train\956PT_0428_best.pt"
+MODEL_PATH = os.path.join(PROJECT_ROOT, "models", "956PT_0428_best.pt")
 # IMG_PATH 由拍照階段自動指定
 model = YOLO(MODEL_PATH)
 results = model(IMG_PATH)
