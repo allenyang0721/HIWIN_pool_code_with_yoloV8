@@ -57,5 +57,5 @@ pip install -r requirements.txt
 
 ## 📮 聯絡方式
 
-本專案由 Gillion-Benny 製作，若有合作需求請私訊。
+本專案由 allen 製作，若有合作需求請私訊。
 
