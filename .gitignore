@@ -1,14 +1,8 @@
-# ✅ 忽略模型與大檔
 *.pt
 *.zip
 *.exe
-
-# ✅ YOLO 結果與圖片
 runs/
 output/
-*.jpg
 *.png
-
-# ✅ 訓練與資料集
+*.jpg
 dataset/
-yoloV8_train/
