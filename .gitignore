@@ -1,8 +1,25 @@
+# YOLO 模型與訓練中間檔
 *.pt
+*.weights
+*.onnx
 *.zip
-*.exe
+*.npy
+*.npz
 runs/
 output/
+dataset/
+take_images/
+
+# 圖片資料
 *.png
 *.jpg
-dataset/
+*.jpeg
+*.bmp
+
+# IDE 與系統
+__pycache__/
+.vscode/
+*.pyc
+
+
+
