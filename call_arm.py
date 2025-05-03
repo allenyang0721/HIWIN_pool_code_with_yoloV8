@@ -14,6 +14,8 @@ while True:
 
     sock.sendall(str(coords_list).encode())
 
+
+    data = sock.recv(1024)
     
 
     sock.close()
