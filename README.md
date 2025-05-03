@@ -8,19 +8,21 @@
 ```
 2025HIWIN_poolball/
 ├── src/                    # 主程式與邏輯
-├── config/                 # 設定檔（如 poolball.yaml）
-├── yoloV8_train/           # YOLO 模型與訓練資料（.pt 不應推送 Git）
+├── yaml_data/                 # 設定檔（如 poolball.yaml）
+├── yoloV8_train/           # YOLO 模型與訓練資料
 ├── output/                 # 拍照結果與分析圖片、JSON 檔
 ├── data_sample/            # 小型圖片測試資料
-├── models/                 # 模型說明與連結
+├── models/                 # 模型說明
+├── output/                 # 輸出決策後路徑.jpg以及母球座標和擊球角度的.json檔案
 ├── requirements.txt        # Python 套件需求
 └── README.md               # 本說明文件
+
 ```
 
 ## 🚀 執行方式
 
 ```bash
-python src/poolball_main.py
+$ python src/HIWIN_yolo_import.py
 ```
 
 1. 啟動後會開啟攝影機，按下「空白鍵」拍照。
@@ -29,7 +31,7 @@ python src/poolball_main.py
 4. 結果將顯示於畫面，並輸出至 `output/`：
 
    - `pool_analysis.png`：圖像標註路徑
-   - `route_data.json`：路徑資料（含角度與球座標）
+   - `route_data.json`：（含角度與母球座標）
 
 ## 🧠 使用模型
 
@@ -55,7 +57,4 @@ pip install -r requirements.txt
 - 建議大型檔案可改以 Release 發佈。
 - 若於 Colab 執行請確保有 camera 模擬資料或改為讀圖模式。
 
-## 📮 聯絡方式
-
-本專案由 Gillion-Benny 製作，若有合作需求請私訊。
 
