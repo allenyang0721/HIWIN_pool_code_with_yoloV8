@@ -14,8 +14,9 @@ SAVE_PATH = f'{PROJECT_ROOT}\output\pool_analysis.png'
 import time
 cap = cv2.VideoCapture(0)
 print("📸 按 [空白鍵] 拍照, [ESC] 離開")
-IMG_PATH = None
-
+#IMG_PATH = r"C:\Users\Gillion-BennyWinNB\Desktop\2025HIWIN_poolball\pool_data_yolo\fo_Photo_007.png"
+IMG_PATH=None
+take="take_images"
 while True:
     ret, frame = cap.read()
     if not ret:
@@ -24,7 +25,7 @@ while True:
     key = cv2.waitKey(1)
     if key == 32:  # Space
         timestamp = time.strftime("%Y%m%d_%H%M%S")
-        IMG_PATH = f"{PROJECT_ROOT}\captured_{timestamp}.png"
+        IMG_PATH = f"{PROJECT_ROOT}\{take}\captured_{timestamp}.png"
         cv2.imwrite(IMG_PATH, frame)
         print(f"✅ 拍照成功：{IMG_PATH}")
         break
@@ -367,18 +368,34 @@ if not best_path:
     incident_angle = compute_incident_angle(wball, bnb, ana)
     exit_angle = compute_exit_angle(ana, rball, h)
 
+
+def angle_from_upward(center, target):
+    """
+    以母球為中心，12點鐘方向為 0 度，順時針為正方向。
+    """
+    dx = target[0] - center[0]
+    dy = target[1] - center[1]
+    rad = math.atan2(dx, -dy)  # 以 y 軸負方向（12點）為 0 度
+    deg = math.degrees(rad)
+    return (deg + 360) % 360
+
+
+target_point = fake if best_path else bnb
+cue_angle = angle_from_upward(wball, target_point)
+
 # ------- ⚡ 導出擊球路徑 JSON ⚡ -------
 output_data = {
-    "bid": bid,
-    "type": "direct" if best_path else "rebound",
+    # "bid": bid,
+    # "type": "direct" if best_path else "rebound",
+    # "rball": rball,
+    # "hole": h,
+    # "fakeball": fake if best_path else ana,
+    # "rebound_point": None if best_path else bnb,
+    # "angle": None if best_path else angle,
+    # "incident_angle": incident_angle,
+    # "exit_angle": exit_angle,
     "wball": wball,
-    "rball": rball,
-    "hole": h,
-    "fakeball": fake if best_path else ana,
-    "rebound_point": None if best_path else bnb,
-    "angle": None if best_path else angle,
-    "incident_angle": incident_angle,
-    "exit_angle": exit_angle
+    "cue_angle": cue_angle
 }
 
 with open('output/route_data.json', 'w') as f:
@@ -388,14 +405,22 @@ for k, v in ball_dict.items():
     cv2.circle(homo, v, BALL_RADIUS, (0, 0, 255) if v == rball else (255, 0, 255), 2)
 
 os.makedirs(os.path.dirname(SAVE_PATH), exist_ok=True)
-cv2.imwrite(SAVE_PATH, homo)
+
 cv2.putText(homo, os.path.basename(IMG_PATH), (20, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
 cv2.putText(homo, f"Ball{bid}", (20, 65), cv2.FONT_HERSHEY_SIMPLEX, 1, (100, 255, 255), 2)
+cv2.putText(homo, f"Cue Angle: {cue_angle:.1f}°", (20, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2) 
+cv2.imwrite(SAVE_PATH, homo)
+if os.path.exists(SAVE_PATH):
+    print(f"✅ 圖片儲存成功：{SAVE_PATH}")
+else:
+    print(f"❌ 圖片儲存失敗，請確認資料夾是否存在")
+
     # if incident_angle is not None:
     #     cv2.putText(homo, f"Incident: {incident_angle:.1f}°", (20, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2)
     # if exit_angle is not None:
     #     cv2.putText(homo, f"Exit: {exit_angle:.1f}°", (20, 135), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 200, 255), 2)
-print(mom)#母球座標
+print(f"母球座標:{mom}")#母球座標
+print(f"Cue Angle: {cue_angle:.4f}°")
 cv2.imshow('poolball', homo)
 cv2.waitKey(0)
 cv2.destroyAllWindows()

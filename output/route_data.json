@@ -1,24 +1,7 @@
 {
-  "bid": 1,
-  "type": "direct",
   "wball": [
-    196,
-    183
+    90,
+    318
   ],
-  "rball": [
-    354,
-    277
-  ],
-  "hole": [
-    599,
-    386
-  ],
-  "fakeball": [
-    328,
-    265
-  ],
-  "rebound_point": null,
-  "angle": null,
-  "incident_angle": null,
-  "exit_angle": null
+  "cue_angle": 33.39358489664289
 }
