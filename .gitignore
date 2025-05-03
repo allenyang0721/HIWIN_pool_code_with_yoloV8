@@ -1,0 +1,44 @@
+# ⚙️ Python Cache
+__pycache__/
+*.py[cod]
+*.ipynb_checkpoints
+
+# 📦 VS Code 設定檔
+.vscode/
+
+# 🧠 模型權重與中間檔
+*.pt
+*.pth
+*.onnx
+*.npy
+*.npz
+*.ckpt
+
+# 📸 圖片與資料集（建議不要直接放在 repo）
+*.jpg
+*.jpeg
+*.png
+*.bmp
+*.tif
+*.tiff
+*.webp
+*.mp4
+*.avi
+*.mov
+
+dataset/
+images/
+video/
+data/
+
+# 📤 輸出結果與分析資料夾
+runs/
+output/
+results/
+inference/
+
+# 💻 系統與其他暫存檔
+.DS_Store
+Thumbs.db
+.env
+*.log
