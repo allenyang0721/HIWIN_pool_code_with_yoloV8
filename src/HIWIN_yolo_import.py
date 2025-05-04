@@ -4,18 +4,23 @@ import cv2
 import os
 
 # ------- ⚡ 參數設定 ⚡ -------
-BALL_RADIUS = 14
-COLLISION_RADIUS = 29  
+BALL_RADIUS = 28
+COLLISION_RADIUS = 58  
 FAKEBALL_OFFSET = BALL_RADIUS * 2
 PROJECT_ROOT=r"C:\Users\Gillion-BennyWinNB\Desktop\2025HIWIN_poolball"#只需要把這行改成這個資料夾的絕對路徑即可
-SAVE_PATH = f'{PROJECT_ROOT}\output\pool_analysis.png'
+SAVE_PATH = os.path.join(PROJECT_ROOT, "output", "pool_analysis.png")
+ROUTE_PATH = os.path.join(PROJECT_ROOT, "output", "route_data.json")
+os.makedirs(os.path.dirname(ROUTE_PATH), exist_ok=True)
 
 # ------- ⚡ 拍照階段：使用 D435 RGB 相機（OpenCV） -------
 import time
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(2)
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)   # 寬度，例如 1280
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)   # 高度，例如 720
+cap.set(cv2.CAP_PROP_FPS, 15)        
 print("📸 按 [空白鍵] 拍照, [ESC] 離開")
-#IMG_PATH = r"C:\Users\Gillion-BennyWinNB\Desktop\2025HIWIN_poolball\pool_data_yolo\fo_Photo_007.png"
-IMG_PATH=None
+IMG_PATH = r"C:\Users\Gillion-BennyWinNB\Desktop\2025HIWIN_poolball\pool_data_yolo\fo_Photo_008.png"#改成圖片的絕對路徑
+#IMG_PATH=None
 take="take_images"
 while True:
     ret, frame = cap.read()
@@ -25,8 +30,8 @@ while True:
     key = cv2.waitKey(1)
     if key == 32:  # Space
         timestamp = time.strftime("%Y%m%d_%H%M%S")
-        IMG_PATH = f"{PROJECT_ROOT}\{take}\captured_{timestamp}.png"
-        cv2.imwrite(IMG_PATH, frame)
+        #IMG_PATH = f"{PROJECT_ROOT}\{take}\captured_{timestamp}.png"
+        #cv2.imwrite(IMG_PATH, frame)
         print(f"✅ 拍照成功：{IMG_PATH}")
         break
     elif key == 27:# ESCgit
@@ -184,6 +189,8 @@ bid = min([k for k in ball_dict.keys() if k in [1, 2, 3]])
 rball = ball_dict[bid]
 obs = [v for k, v in ball_dict.items() if k != bid]
 wball = mom
+
+crush_one_precise(mom,mom, mom)
 
 best_path = None
 best_score = float('inf')
@@ -369,19 +376,31 @@ if not best_path:
     exit_angle = compute_exit_angle(ana, rball, h)
 
 
-def angle_from_upward(center, target):
+def angle_from_downward_signed(center, target):
     """
-    以母球為中心，12點鐘方向為 0 度，順時針為正方向。
+    以母球為中心，6點鐘方向為 0 度。
+    順時針為正（0 ~ 179.9°），逆時針為負（0 ~ -179.9°）。
     """
     dx = target[0] - center[0]
     dy = target[1] - center[1]
-    rad = math.atan2(dx, -dy)  # 以 y 軸負方向（12點）為 0 度
+    rad = math.atan2(dx, dy)  # 以 y 軸正方向（6點）為基準
     deg = math.degrees(rad)
-    return (deg + 360) % 360
+    # 限制角度範圍在 (-180, 180]
+    if deg > 180:
+        deg -= 360
+    return deg
+
+if best_path:
+    cue_angle = angle_from_downward_signed(wball, fake)
+else:    
+    target_point = fake if best_path else bnb # 目標點是反彈點還是假想球
+    if best_path:
+        cue_angle = angle_from_downward_signed(wball, target_point)
+    else:
+        cue_angle = angle_from_downward_signed(wball, bnb)
+        target_point = fake if best_path else bnb
 
 
-target_point = fake if best_path else bnb
-cue_angle = angle_from_upward(wball, target_point)
 
 # ------- ⚡ 導出擊球路徑 JSON ⚡ -------
 output_data = {
@@ -398,7 +417,7 @@ output_data = {
     "cue_angle": cue_angle
 }
 
-with open('output/route_data.json', 'w') as f:
+with open(ROUTE_PATH, 'w') as f:
     json.dump(output_data, f, indent=2)
 cv2.circle(homo, mom, BALL_RADIUS, (255, 255, 255), 2)
 for k, v in ball_dict.items():
