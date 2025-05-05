@@ -4,7 +4,7 @@ import cv2
 import os
 
 # ------- ⚡ 參數設定 ⚡ -------
-BALL_RADIUS = 28
+BALL_RADIUS =28
 COLLISION_RADIUS = 58  
 FAKEBALL_OFFSET = BALL_RADIUS * 2
 PROJECT_ROOT=r"C:\Users\Gillion-BennyWinNB\Desktop\2025HIWIN_poolball"#只需要把這行改成這個資料夾的絕對路徑即可
@@ -19,8 +19,8 @@ cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)   # 寬度，例如 1280
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)   # 高度，例如 720
 cap.set(cv2.CAP_PROP_FPS, 15)        
 print("📸 按 [空白鍵] 拍照, [ESC] 離開")
-IMG_PATH = r"C:\Users\Gillion-BennyWinNB\Desktop\2025HIWIN_poolball\pool_data_yolo\fo_Photo_008.png"#改成圖片的絕對路徑
-#IMG_PATH=None
+#IMG_PATH = r"C:\Users\Gillion-BennyWinNB\Desktop\2025HIWIN_poolball\take_images\captured_20250504_213321.png"#改成圖片的絕對路徑
+IMG_PATH=None
 take="take_images"
 while True:
     ret, frame = cap.read()
@@ -30,11 +30,11 @@ while True:
     key = cv2.waitKey(1)
     if key == 32:  # Space
         timestamp = time.strftime("%Y%m%d_%H%M%S")
-        #IMG_PATH = f"{PROJECT_ROOT}\{take}\captured_{timestamp}.png"
-        #cv2.imwrite(IMG_PATH, frame)
+        IMG_PATH = f"{PROJECT_ROOT}\{take}\captured_{timestamp}.png"
+        cv2.imwrite(IMG_PATH, frame)
         print(f"✅ 拍照成功：{IMG_PATH}")
         break
-    elif key == 27:# ESCgit
+    elif key == 27:# ESC
         cap.release()
         cv2.destroyAllWindows()
         exit()
@@ -255,7 +255,7 @@ else:
             mixf1 = fakeball(mid, h)
             mixf2 = fakeball(rball, mixf1)
             if not crush_precise(wball, mixf2, obs) and not crush_precise(mixf2, rball, obs) and not crush_precise(rball, mixf1, obs) and not crush_precise(mid, h, obs) and not crush_precise(rball, mid, obs):
-                angle_score = getAngle(wball, mixf2, rball) + getAngle(rball, mixf1, mid)
+                angle_score = getAngle(wball, mixf2, rball) + getAngle(rball, mixf1, mid) 
                 dist_score = np.linalg.norm(np.array(wball) - np.array(mixf2)) + \
                              np.linalg.norm(np.array(mixf2) - np.array(rball)) + \
                              np.linalg.norm(np.array(rball) - np.array(mixf1)) + \

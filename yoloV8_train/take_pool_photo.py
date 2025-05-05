@@ -1,53 +1,38 @@
-import pyrealsense2 as rs
-import numpy as np
 import cv2
 import os
 
-# 建立 RealSense pipeline
-pipeline = rs.pipeline()
-config = rs.config()
-
-# 啟用彩色影像串流
-config.enable_stream(rs.stream.color, 1280, 720, rs.format.bgr8, 15)
-
-# 啟動 pipeline
-pipeline.start(config)
+# 初始化攝影機（0 通常是預設攝影機）
+cap = cv2.VideoCapture(2)  
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+cap.set(cv2.CAP_PROP_FPS, 6)
 
 print("按下空白鍵以拍照並儲存圖片，按下 ESC 鍵退出程式")
 
-# 創建儲存圖片的資料夾
-save_dir = 'take_images'
+# 建立儲存圖片資料夾
+save_dir = r"C:\Users\Gillion-BennyWinNB\Desktop\2025HIWIN_poolball\take_photo_pool"
 os.makedirs(save_dir, exist_ok=True)
 
 img_counter = 0
 
-try:
-    while True:
-        # 等待新的 frames
-        frames = pipeline.wait_for_frames()
-        color_frame = frames.get_color_frame()
+while True:
+    ret, frame = cap.read()
+    if not ret:
+        print("無法讀取影像")
+        break
 
-        if not color_frame:
-            continue
+    cv2.imshow('Webcam', frame)
+    key = cv2.waitKey(1)
 
-        # 將影像轉成 numpy 陣列
-        color_image = np.asanyarray(color_frame.get_data())
+    if key == 27:  # ESC 鍵
+        print("結束程式")
+        break
+    elif key == 32:  # 空白鍵
+        img_name = os.path.join(save_dir, f"extra_photo_{img_counter:03d}.png")
+        cv2.imwrite(img_name, frame)
+        print(f"已儲存：{img_name}")
+        img_counter += 1
 
-        # 顯示影像
-        cv2.imshow('RealSense Camera', color_image)
-
-        key = cv2.waitKey(1)
-
-        if key == 27:  # 按下 ESC 鍵
-            print("結束程式")
-            break
-        elif key == 32:  # 按下空白鍵
-            img_name = os.path.join(save_dir, f"photo_{img_counter:03d}.png")
-            cv2.imwrite(img_name, color_image)
-            print(f"已儲存：{img_name}")
-            img_counter += 1
-
-finally:
-    # 關閉 pipeline 與視窗
-    pipeline.stop()
-    cv2.destroyAllWindows()
+# 釋放資源
+cap.release()
+cv2.destroyAllWindows()
