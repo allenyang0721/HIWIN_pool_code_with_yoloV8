@@ -6,7 +6,7 @@ while True:
     if command.upper() == "EXIT":
         break
 
-    coords_list = [int(x) for x in command.split()]
+    coords_list = [float(x) for x in command.split()]
 
     
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -14,6 +14,6 @@ while True:
 
     sock.sendall(str(coords_list).encode())
 
-    
+    #-120 -88 534 180 0 -92.5
 
     sock.close()

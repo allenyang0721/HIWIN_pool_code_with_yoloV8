@@ -10,7 +10,7 @@ cap.set(cv2.CAP_PROP_FPS, 6)
 print("按下空白鍵以拍照並儲存圖片，按下 ESC 鍵退出程式")
 
 # 建立儲存圖片資料夾
-save_dir = r"C:\Users\Gillion-BennyWinNB\Desktop\2025HIWIN_poolball\take_photo_pool"
+save_dir = r"C:\Users\Gillion-BennyWinNB\Desktop\2025HIWIN_poolball\han_test"
 os.makedirs(save_dir, exist_ok=True)
 
 img_counter = 0
@@ -28,7 +28,7 @@ while True:
         print("結束程式")
         break
     elif key == 32:  # 空白鍵
-        img_name = os.path.join(save_dir, f"extra_photo_{img_counter:03d}.png")
+        img_name = os.path.join(save_dir, f"han_{img_counter:03d}.png")
         cv2.imwrite(img_name, frame)
         print(f"已儲存：{img_name}")
         img_counter += 1
