@@ -15,5 +15,6 @@ while True:
     sock.sendall(str(coords_list).encode())
 
     #-120 -88 534 180 0 -92.5
+    #
 
     sock.close()

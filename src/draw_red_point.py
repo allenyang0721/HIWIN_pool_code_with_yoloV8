@@ -6,7 +6,7 @@ template = cv2.threshold(template, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[
 w, h = template.shape[::-1]
 
 # 開啟攝影鏡頭
-cap = cv2.VideoCapture(2)
+cap = cv2.VideoCapture(3)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
 

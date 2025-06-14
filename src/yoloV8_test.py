@@ -1,41 +1,86 @@
-from ultralytics import YOLO
+import os
+import math
+import json
+import time
+import socket
 import cv2
+import numpy as np
+import serial
+from Coordinate_mapping_combined import (
+    first_calibration, second_calibration_new
+)
+from ultralytics import YOLO
 
-def capture_and_detect():
-    # 1️⃣ 載入模型
-    model = YOLO(r"C:\Users\Gillion-BennyWinNB\Desktop\2025HIWIN_poolball\models\956PT_0428_best.pt")
+# 請確保下面這些函式在同一個檔案中可用
+# from your_module import run_once_and_render, hit_ball
 
-    # 2️⃣ 開啟鏡頭
-    cap = cv2.VideoCapture(2)
-    ret, frame = cap.read()
+# 1️⃣ 載入 YOLO 模型（路徑改成你的 .pt 檔案位置）
+model = YOLO(r"C:\Users\Gillion-BennyWinNB\Desktop\2025HIWIN_poolball\models\956PT_0428_best.pt")
+
+def detect_and_render(frame):
+    """
+    對單張影像做 YOLO 偵測，並回傳預測結果物件。
+    """
+    results = model.predict(
+        source=frame,
+        save=False,
+        imgsz=640,
+        conf=0.5
+    )
+    return results[0]  # 取第一張（此例只有一張）
+
+def main():
+    # 打開攝影機
+    cap = cv2.VideoCapture(3)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+    cap.set(cv2.CAP_PROP_FPS, 15)
+
+    print("🚀 啟動中，按下 SPACE 拍照並開始偵測／決策；ESC 離開。")
+    while True:
+        ret, frame = cap.read()
+        if not ret:
+            print("❌ 無法讀取攝影機影像")
+            break
+
+        # 即時畫面
+        cv2.imshow("Live View", frame)
+        key = cv2.waitKey(1) & 0xFF
+
+        if key == 27:  # ESC
+            print("結束")
+            break
+
+        elif key == 32:  # SPACE
+            # 1. 拍照（直接取得當下 frame）
+            snapshot = frame.copy()
+
+            # 2. YOLO 偵測（你可自行視覺化 detect_result.show()）
+            detect_result = detect_and_render(snapshot)
+
+            # （選擇性）顯示偵測框結果
+            detect_result.show()
+            cv2.waitKey(0)
+            cv2.destroyWindow("YOLO")
+
+            # 3. 執行你的撞球決策與繪圖邏輯
+            #    run_once_and_render 回傳 (out_img, params)
+            out_img, params = run_once_and_render(snapshot)
+
+            # 4. 印出參數，並把路徑圖存檔
+            print("決策參數：", params)
+            cv2.imwrite("out.png", out_img)
+
+            # 5. 根據參數呼叫打擊函式
+            hit_ball()
+
+            # 6. （選擇性）顯示最終路徑圖
+            cv2.imshow("決策後路徑", out_img)
+            cv2.waitKey(0)
+            cv2.destroyWindow("決策後路徑")
+
     cap.release()
-
-    if not ret:
-        print("❌ 無法讀取攝影機影像")
-        return None, None, None
-
-    # 3️⃣ YOLO 偵測
-    results = model.predict(source=frame, save=False, imgsz=640, conf=0.5)
-    result = results[0]
-
-    # 4️⃣ 尋找類別 0 的第一個目標
-    for box in result.boxes:
-        class_id = int(box.cls[0])
-        if class_id == 0:
-            x1, y1, x2, y2 = box.xyxy[0]
-            x_center = int((x1 + x2) / 2)
-            y_center = int((y1 + y2) / 2)
-            print(f"✅ 類別0中心座標：x={x_center}, y={y_center}")
-            return frame, x_center, y_center
-
-    print("⚠️ 未偵測到類別0")
-    return frame, None, None
-
-# 🔁 呼叫函式
-image, x, y = capture_and_detect()
-
-# ✅ 顯示拍攝影像（可選）
-if image is not None:
-    cv2.imshow("Captured Frame", image)
-    cv2.waitKey(0)
     cv2.destroyAllWindows()
+
+if __name__ == "__main__":
+    main()

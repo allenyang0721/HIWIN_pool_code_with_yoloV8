@@ -58,7 +58,7 @@ def first_calibration(x, y,angle_on_image):
 #     return x_new, y_new, 80, 180, 0, c_ans, k_rad
 
 def second_calibration_new(a_int,b_int,sx,sy,angle_on_image):
-    targetx,targety = 750,70#理想打擊點像素座標
+    targetx,targety = 700,70#理想打擊點像素座標
     arm_movement = 12 #每移動一格機械手臂，會移動多少像素
     arm_x=(targetx-sx)
     arm_y=(targety-sy)
@@ -113,7 +113,7 @@ def second_calibration_new(a_int,b_int,sx,sy,angle_on_image):
         move_x=0
         move_y=0
         print("case9")
-    print(f"move_x:{move_x},move_y:{move_y}")
+    #print(f"move_x:{move_x},move_y:{move_y}")
     if move_x == 0 and move_y == 0:
         return a_int,b_int,100,180,0,c_ans
     else:
